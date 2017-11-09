@@ -26,25 +26,45 @@ export default class CircularProgress extends React.Component {
 
   render() {
     const { size, width, tintColor, backgroundColor, style, strokeCap, rotation, cropDegree, children } = this.props;
-    const backgroundPath = this.circlePath(size / 2, size / 2, size / 2 - width / 2, 0, (360 * 99.9 / 100) - cropDegree);
+    const containerSize = size + 12
+
+    const backgroundPath = this.circlePath(containerSize / 2, containerSize / 2, size / 2 - width / 2, 0, (360 * 99.9 / 100) - cropDegree);
 
     const fill = this.extractFill(this.props.fill);
-    const circlePath = this.circlePath(size / 2, size / 2, size / 2 - width / 2, 0, ((360 * 99.9 / 100) - cropDegree) * fill / 100 );
+    const circlePath = this.circlePath(containerSize / 2, containerSize / 2, size / 2 - width / 2, 0, ((360 * 99.9 / 100) - cropDegree) * fill / 100 );
+
+    const endDegrees = (((360 * 99.9 / 100) - cropDegree) * fill / 100)
+    const endRadians = endDegrees * Math.PI / 180
+
+    const x = (containerSize/2) + (size / 2 - width / 2) * Math.cos(endRadians)
+    const y = (containerSize/2) + (size / 2 - width / 2) * Math.sin(endRadians)
+
+    const smallCircle = this.circlePath(x, y, 4, 0, 359)
+
+    console.log('x: ' + x)
+    console.log('y: ' + y)
 
     return (
-      <View style={style}>
+      <View style={[style, {alignItems: 'center'}]}>
         <Surface
-          width={size}
-          height={size}>
-          <Group rotation={rotation + cropDegree/2} originX={size/2} originY={size/2}>
+          width={containerSize}
+          height={containerSize}>
+          <Group rotation={rotation + cropDegree/2} originX={containerSize/2} originY={containerSize/2}>
             <Shape d={backgroundPath}
                    stroke={backgroundColor}
                    strokeWidth={width}
+                   fill='white'
                    strokeCap={strokeCap}/>
             <Shape d={circlePath}
                    stroke={tintColor}
-                   strokeWidth={width}
+                   strokeWidth={3}
+                   fill='white'
                    strokeCap={strokeCap}/>
+            <Shape d={smallCircle}
+                   stroke={backgroundColor}
+                   fill='white'
+                   strokeWidth={4}
+                   strokeCap={strokeCap} />
           </Group>
         </Surface>
         {
